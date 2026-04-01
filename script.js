@@ -214,9 +214,9 @@ videoCards.forEach((card, index) => {
     }
 });
 const aboutBio = document.querySelector('.about-bio');
-const titleLines = document.querySelectorAll('.title-line');
 const bioLines = document.querySelectorAll('.bio-line');
 const aboutArsenal = document.querySelector('.about-arsenal');
+const aboutHeadline = document.querySelector('.about-headline');
 
 // Bio fade-in trigger
 gsap.to(aboutBio, {
@@ -229,12 +229,11 @@ gsap.to(aboutBio, {
     }
 });
 
-// Staggered title line reveal
-gsap.to(titleLines, {
-    opacity: 1,
-    y: 0,
-    duration: 1,
-    stagger: 0.2,
+// Headline reveal
+gsap.from(aboutHeadline, {
+    opacity: 0,
+    y: 100,
+    duration: 1.5,
     ease: 'power3.out',
     scrollTrigger: {
         trigger: '#about',
@@ -265,6 +264,113 @@ gsap.to(aboutArsenal, {
         trigger: '.about-arsenal',
         start: 'top 80%',
     }
+});
+
+/* ===========================
+   Stats Counter Animation
+   =========================== */
+const statNumbers = document.querySelectorAll('.stat-number');
+
+statNumbers.forEach((stat) => {
+    const target = parseInt(stat.getAttribute('data-target'));
+    
+    ScrollTrigger.create({
+        trigger: '.stats-grid',
+        start: 'top 80%',
+        once: true,
+        onEnter: () => {
+            gsap.to(stat, {
+                innerText: target,
+                duration: 2,
+                ease: 'power3.out',
+                snap: { innerText: 1 },
+                onUpdate: function() {
+                    stat.innerText = Math.floor(this.targets()[0].innerText);
+                }
+            });
+        }
+    });
+});
+
+/* ===========================
+   Text Dodge Effect
+   =========================== */
+function splitTextForDodge(element) {
+    const text = element.innerHTML;
+    let newHTML = '';
+    let insideTag = false;
+    let currentTag = '';
+    
+    for (let i = 0; i < text.length; i++) {
+        const char = text[i];
+        
+        if (char === '<') {
+            insideTag = true;
+            currentTag += char;
+        } else if (char === '>') {
+            insideTag = false;
+            currentTag += char;
+            newHTML += currentTag;
+            currentTag = '';
+        } else if (insideTag) {
+            currentTag += char;
+        } else if (char === ' ') {
+            newHTML += ' ';
+        } else {
+            newHTML += `<span class="dodge-letter">${char}</span>`;
+        }
+    }
+    
+    element.innerHTML = newHTML;
+}
+
+// Apply text dodge to headlines
+const dodgeTexts = document.querySelectorAll('.dodge-text');
+dodgeTexts.forEach(splitTextForDodge);
+
+// Get all dodge letters
+const dodgeLetters = document.querySelectorAll('.dodge-letter');
+const repelRadius = 100;
+const repelStrength = 75; // Tripled for aggressive text dodge
+
+// Mousemove handler for text repel
+document.addEventListener('mousemove', (e) => {
+    const mouseX = e.clientX;
+    const mouseY = e.clientY;
+    
+    dodgeLetters.forEach((letter) => {
+        const rect = letter.getBoundingClientRect();
+        const letterCenterX = rect.left + rect.width / 2;
+        const letterCenterY = rect.top + rect.height / 2;
+        
+        const deltaX = letterCenterX - mouseX;
+        const deltaY = letterCenterY - mouseY;
+        const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+        
+        if (distance < repelRadius) {
+            // Calculate repel force (stronger when closer)
+            const force = (repelRadius - distance) / repelRadius;
+            const angle = Math.atan2(deltaY, deltaX);
+            
+            const moveX = Math.cos(angle) * force * repelStrength;
+            const moveY = Math.sin(angle) * force * repelStrength;
+            
+            gsap.to(letter, {
+                x: moveX,
+                y: moveY,
+                duration: 0.2,
+                ease: 'power2.out',
+            });
+        } else {
+            // Return to original position
+            gsap.to(letter, {
+                x: 0,
+                y: 0,
+                duration: 0.4,
+                ease: 'elastic.out(1, 0.5)',
+            });
+        }
+    });
 });
 
 /* ===========================

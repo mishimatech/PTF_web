@@ -12,11 +12,12 @@
     --crimson-accent: #8a3535;
     --crimson-highlight: #b84545;
     
-    /* Split-Complementary Teal */
-    --bg-teal: #051A1F;
-    --accent-cyan: #00e5ff;
-    --teal-dark: #031114;
-    --teal-glow: rgba(0, 229, 255, 0.15);
+    /* Footer Dark Crimson */
+    --bg-dark-crimson: #110303;
+    
+    /* Vibrant Red Accent (replaces cyan - pure monochrome) */
+    --accent-vibrant-red: #ff4545;
+    --red-glow: rgba(255, 69, 69, 0.15);
     
     /* Background Layers */
     --bg-base: #0d0505;
@@ -270,11 +271,12 @@ button {
     position: fixed;
     width: 20px;
     height: 20px;
-    border: 2px solid var(--crimson-highlight);
+    border: 2px solid var(--accent-vibrant-red);
     border-radius: 50%;
     pointer-events: none;
     z-index: 9999;
     transform: translate(-50%, -50%);
+    background: transparent;
     transition: width 0.3s cubic-bezier(0.23, 1, 0.32, 1),
                 height 0.3s cubic-bezier(0.23, 1, 0.32, 1),
                 border-color 0.3s ease,
@@ -285,9 +287,9 @@ button {
 .custom-cursor.cursor-hover {
     width: 60px;
     height: 60px;
-    border-color: var(--crimson-highlight);
-    background: rgba(184, 69, 69, 0.2);
-    box-shadow: 0 0 30px rgba(184, 69, 69, 0.4);
+    border-color: var(--accent-vibrant-red);
+    background: rgba(255, 69, 69, 0.15);
+    box-shadow: 0 0 30px rgba(255, 69, 69, 0.4);
 }
 
 /* ===========================
@@ -322,13 +324,28 @@ button {
     pointer-events: auto;
 }
 
-/* Remove Spline watermark/logo styling */
+/* Remove Spline watermark/logo */
 #spline-hero::part(logo) {
-    display: none;
+    display: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+}
+
+/* Fallback: hide any Spline branding via shadow DOM piercing */
+spline-viewer {
+    --spline-logo-display: none;
+}
+
+/* Hide watermark container if it escapes shadow DOM */
+#spline-hero a[href*="spline"],
+#spline-hero div[class*="logo"],
+#spline-hero img[alt*="Spline"] {
+    display: none !important;
 }
 
 /* ===========================
-   About Section - Slide In
+   About Section - Vibrant
    =========================== */
 #about {
     position: relative;
@@ -336,46 +353,62 @@ button {
     padding: var(--spacing-xl) var(--spacing-md);
     display: flex;
     align-items: center;
+    justify-content: center;
     background: transparent;
     transform: translateX(100vw);
     opacity: 0;
     will-change: transform, opacity;
 }
 
-.about-grid {
+.about-container {
     max-width: 1400px;
     margin: 0 auto;
+    width: 100%;
+}
+
+/* Massive Vibrant Headline */
+.about-headline {
+    font-family: var(--font-display);
+    font-size: clamp(3rem, 12vw, 10rem);
+    font-weight: 900;
+    line-height: 0.95;
+    text-transform: uppercase;
+    letter-spacing: -0.04em;
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-xl);
+    text-align: center;
+}
+
+.headline-line {
+    display: block;
+}
+
+.highlight-red {
+    color: var(--accent-vibrant-red);
+    text-shadow: 0 0 80px rgba(255, 69, 69, 0.5),
+                 0 0 120px rgba(255, 69, 69, 0.3);
+}
+
+/* Text Dodge Letters */
+.dodge-letter {
+    display: inline-block;
+    transition: transform 0.15s ease-out;
+    will-change: transform;
+}
+
+.about-grid {
+    max-width: 1400px;
+    margin: 0 auto var(--spacing-xl);
     width: 100%;
     display: grid;
     grid-template-columns: 1.2fr 0.8fr;
     gap: 4rem;
-    align-items: center;
+    align-items: start;
 }
 
 /* Bio Column */
 .about-bio {
     opacity: 0;
-}
-
-.about-title {
-    font-family: var(--font-display);
-    font-size: clamp(2.5rem, 6vw, 5rem);
-    font-weight: 800;
-    line-height: 1.1;
-    margin-bottom: var(--spacing-lg);
-    color: var(--text-primary);
-    text-transform: uppercase;
-    letter-spacing: -0.02em;
-}
-
-.title-line {
-    display: block;
-    opacity: 0;
-    transform: translateY(40px);
-}
-
-.title-line:last-child {
-    color: var(--crimson-highlight);
 }
 
 .bio-content {
@@ -451,7 +484,7 @@ button {
     font-family: var(--font-display);
     font-size: 1.2rem;
     font-weight: 600;
-    color: #4ecdc4;
+    color: var(--accent-vibrant-red);
     letter-spacing: 0.02em;
 }
 
@@ -460,6 +493,50 @@ button {
     color: var(--text-secondary);
     text-transform: uppercase;
     letter-spacing: 0.05em;
+}
+
+/* Stats Grid */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+    max-width: 1000px;
+    margin: 0 auto;
+    padding-top: var(--spacing-lg);
+    border-top: 1px solid rgba(138, 53, 53, 0.2);
+}
+
+.stat-item {
+    text-align: center;
+    padding: 2rem;
+}
+
+.stat-number {
+    font-family: var(--font-display);
+    font-size: clamp(3rem, 8vw, 5rem);
+    font-weight: 900;
+    color: var(--accent-vibrant-red);
+    line-height: 1;
+    display: inline;
+    text-shadow: 0 0 40px rgba(255, 69, 69, 0.4);
+}
+
+.stat-plus {
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 5vw, 3rem);
+    font-weight: 700;
+    color: var(--crimson-highlight);
+    vertical-align: super;
+}
+
+.stat-label {
+    display: block;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-top: 1rem;
 }
 
 /* About Section Responsive */
@@ -472,6 +549,11 @@ button {
     .about-arsenal {
         transform: translateY(40px);
     }
+    
+    .stats-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
 }
 
 @media (max-width: 768px) {
@@ -479,8 +561,8 @@ button {
         padding: var(--spacing-lg) var(--spacing-sm);
     }
     
-    .about-title {
-        font-size: clamp(2rem, 8vw, 3rem);
+    .about-headline {
+        font-size: clamp(2rem, 10vw, 4rem);
     }
     
     .bio-line {
@@ -656,7 +738,7 @@ button {
 }
 
 /* ===========================
-   Agency Contact Footer - Teal Peel
+   Agency Contact Footer - Dark Crimson
    =========================== */
 #contact-footer {
     position: relative;
@@ -665,9 +747,9 @@ button {
     padding: var(--spacing-xl) var(--spacing-md);
     background: linear-gradient(
         135deg,
-        var(--teal-dark) 0%,
-        var(--bg-teal) 50%,
-        #07252d 100%
+        var(--bg-dark-crimson) 0%,
+        #1a0808 50%,
+        var(--bg-dark-crimson) 100%
     );
     /* Initial hidden state - peels up from bottom */
     clip-path: polygon(0% 100%, 100% 100%, 100% 100%, 0% 100%);
@@ -690,7 +772,7 @@ button {
     align-items: center;
     justify-content: center;
     padding: var(--spacing-xl) 0;
-    border-bottom: 1px solid rgba(0, 229, 255, 0.1);
+    border-bottom: 1px solid rgba(138, 53, 53, 0.2);
 }
 
 .hook-content {
@@ -716,8 +798,8 @@ button {
 }
 
 .cta-line.accent {
-    color: var(--accent-cyan);
-    text-shadow: 0 0 60px rgba(0, 229, 255, 0.4);
+    color: var(--crimson-highlight);
+    text-shadow: 0 0 60px rgba(184, 69, 69, 0.4);
 }
 
 /* Magnetic Button */
@@ -727,7 +809,7 @@ button {
     gap: 1rem;
     padding: 1.5rem 3rem;
     background: transparent;
-    border: 2px solid var(--accent-cyan);
+    border: 2px solid var(--crimson-highlight);
     border-radius: 60px;
     cursor: pointer;
     transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
@@ -735,33 +817,33 @@ button {
 }
 
 .magnetic-btn:hover {
-    background: var(--accent-cyan);
-    box-shadow: 0 0 40px rgba(0, 229, 255, 0.4),
-                0 0 80px rgba(0, 229, 255, 0.2);
+    background: var(--crimson-highlight);
+    box-shadow: 0 0 40px rgba(184, 69, 69, 0.4),
+                0 0 80px rgba(138, 53, 53, 0.2);
 }
 
 .btn-text {
     font-family: var(--font-display);
     font-size: 1.1rem;
     font-weight: 700;
-    color: var(--accent-cyan);
+    color: var(--crimson-highlight);
     text-transform: uppercase;
     letter-spacing: 0.1em;
     transition: color 0.3s ease;
 }
 
 .magnetic-btn:hover .btn-text {
-    color: var(--teal-dark);
+    color: #ffffff;
 }
 
 .btn-arrow {
     font-size: 1.5rem;
-    color: var(--accent-cyan);
+    color: var(--crimson-highlight);
     transition: all 0.3s ease;
 }
 
 .magnetic-btn:hover .btn-arrow {
-    color: var(--teal-dark);
+    color: #ffffff;
     transform: translate(3px, -3px);
 }
 
@@ -797,7 +879,7 @@ button {
 }
 
 .detail-link:hover {
-    color: var(--accent-cyan);
+    color: var(--crimson-highlight);
 }
 
 .detail-link.email {
@@ -815,7 +897,7 @@ button {
     font-family: var(--font-display);
     font-size: 1.5rem;
     font-weight: 700;
-    color: var(--accent-cyan);
+    color: var(--crimson-highlight);
     letter-spacing: 0.05em;
 }
 
