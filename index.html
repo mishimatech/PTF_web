@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PTF — Video Director Portfolio</title>
+    <link rel="stylesheet" href="styles.css">
+    
+    <!-- GSAP Core + ScrollTrigger -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+    
+    <!-- Lenis Smooth Scroll -->
+    <script src="https://cdn.jsdelivr.net/gh/studio-freight/lenis@1.0.29/bundled/lenis.min.js"></script>
+    
+    <!-- Spline 3D Viewer -->
+    <script type="module" src="https://unpkg.com/@splinetool/viewer@1.12.73/build/spline-viewer.js"></script>
+</head>
+<body>
+    
+    <!-- Preloader with CSS 3D Cube -->
+    <div id="preloader">
+        <div class="loader-container">
+            <div class="cube">
+                <div class="cube-face cube-front"></div>
+                <div class="cube-face cube-back"></div>
+                <div class="cube-face cube-left"></div>
+                <div class="cube-face cube-right"></div>
+                <div class="cube-face cube-top"></div>
+                <div class="cube-face cube-bottom"></div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Animated Mesh Background -->
+    <div class="mesh-bg"></div>
+    <div class="mesh-overlay"></div>
+    
+    <!-- Custom Cursor -->
+    <div class="custom-cursor"></div>
+    
+    <!-- Hero Section -->
+    <section id="hero">
+        <div class="hero-sticky">
+            <!-- 3D Spline Canvas — Sole Focus -->
+            <spline-viewer 
+                id="spline-hero"
+                url="https://prod.spline.design/pTjyzAGN44TTBEjM/scene.splinecode"
+                loading="lazy">
+            </spline-viewer>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about">
+        <div class="about-grid">
+            
+            <!-- Left Column: Bio -->
+            <div class="about-bio">
+                <h2 class="about-title">
+                    <span class="title-line">The Director</span>
+                    <span class="title-line">Behind the Chaos</span>
+                </h2>
+                <div class="bio-content">
+                    <p class="bio-line">I'm <strong>Ryan Joshy</strong>, a 19-year-old visual storyteller currently studying at Christ University, Bommasandra.</p>
+                    <p class="bio-line">I live for the adrenaline of high-octane gaming montages — capturing clutch Valorant plays, the brutal elegance of Elden Ring boss fights, and the relentless intensity of Souls games.</p>
+                    <p class="bio-line">But beyond the gameplay, I craft <em>thrilling, psychological visual stories</em> — edits that don't just show action, but make you <strong>feel</strong> the tension, the dread, the triumph.</p>
+                    <p class="bio-line">Every frame is deliberate. Every cut is calculated. Every second is designed to pull you deeper into the chaos.</p>
+                </div>
+            </div>
+
+            <!-- Right Column: Arsenal/Toolkit -->
+            <div class="about-arsenal">
+                <div class="arsenal-card">
+                    <h3 class="arsenal-title">The Arsenal</h3>
+                    <ul class="arsenal-list">
+                        <li class="arsenal-item">
+                            <span class="tool-name">Adobe After Effects</span>
+                            <span class="tool-desc">Motion & VFX</span>
+                        </li>
+                        <li class="arsenal-item">
+                            <span class="tool-name">Adobe Premiere Pro</span>
+                            <span class="tool-desc">Editing & Assembly</span>
+                        </li>
+                        <li class="arsenal-item">
+                            <span class="tool-name">Paint.net</span>
+                            <span class="tool-desc">Graphics & Assets</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Video Gallery - Stacking Cards -->
+    <section id="gallery">
+        <div class="gallery-container">
+            
+            <!-- Card 1 -->
+            <div class="video-card" data-card="1">
+                <div class="card-media">
+                    <img src="https://images.unsplash.com/photo-1542751371-adc38448a05e?w=800&h=600&fit=crop" alt="Intense Valorant competitive gameplay highlight">
+                </div>
+                <div class="card-overlay">
+                    <h3 class="card-title">Valorant Clutch Montages</h3>
+                    <p class="card-desc">Precision. Tactics. Victory.</p>
+                </div>
+            </div>
+
+            <!-- Card 2 -->
+            <div class="video-card" data-card="2">
+                <div class="card-media">
+                    <img src="https://images.unsplash.com/photo-1511512578047-dfb367046420?w=800&h=600&fit=crop" alt="Epic Elden Ring boss battle cinematics">
+                </div>
+                <div class="card-overlay">
+                    <h3 class="card-title">Elden Ring Boss Cinematics</h3>
+                    <p class="card-desc">Souls. Glory. Nightmare.</p>
+                </div>
+            </div>
+
+            <!-- Card 3 -->
+            <div class="video-card" data-card="3">
+                <div class="card-media">
+                    <img src="https://images.unsplash.com/photo-1538481199705-c710c4e965fc?w=800&h=600&fit=crop" alt="Space Marine 2 campaign intense warfare">
+                </div>
+                <div class="card-overlay">
+                    <h3 class="card-title">Space Marine 2 Campaign</h3>
+                    <p class="card-desc">War. Honor. Emperor.</p>
+                </div>
+            </div>
+
+            <!-- Card 4 -->
+            <div class="video-card" data-card="4">
+                <div class="card-media">
+                    <img src="https://images.unsplash.com/photo-1485846234645-a62644f84728?w=800&h=600&fit=crop" alt="Psychological thriller edit inspired by Hannibal">
+                </div>
+                <div class="card-overlay">
+                    <h3 class="card-title">The Hannibal Edit</h3>
+                    <p class="card-desc">Darkness. Elegance. Terror.</p>
+                </div>
+            </div>
+
+            <!-- Card 5 -->
+            <div class="video-card" data-card="5">
+                <div class="card-media">
+                    <img src="https://images.unsplash.com/photo-1518546305927-5a555bb7020d?w=800&h=600&fit=crop" alt="Creative Minecraft modding showcase">
+                </div>
+                <div class="card-overlay">
+                    <h3 class="card-title">Minecraft Modding Showcases</h3>
+                    <p class="card-desc">Build. Mod. Infinite.</p>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Agency Contact Footer - Teal Peel Reveal -->
+    <section id="contact-footer">
+        <div class="footer-inner">
+            
+            <!-- Top Half: The Hook -->
+            <div class="footer-hook">
+                <div class="hook-content">
+                    <h2 class="footer-cta-heading">
+                        <span class="cta-line">Let's Create</span>
+                        <span class="cta-line accent">Reality.</span>
+                    </h2>
+                    <button class="magnetic-btn" data-magnetic>
+                        <span class="btn-text">Get in Touch</span>
+                        <span class="btn-arrow">↗</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Bottom Half: The Details -->
+            <div class="footer-details">
+                
+                <!-- Column 1: Email -->
+                <div class="detail-col">
+                    <span class="detail-label">Say Hello</span>
+                    <a href="mailto:hello@ryanjoshy.com" class="detail-link email">
+                        hello@ryanjoshy.com
+                    </a>
+                </div>
+
+                <!-- Column 2: Socials -->
+                <div class="detail-col">
+                    <span class="detail-label">Follow</span>
+                    <div class="social-stack">
+                        <a href="https://twitter.com" target="_blank" rel="noopener" class="detail-link">Twitter / X</a>
+                        <a href="https://youtube.com" target="_blank" rel="noopener" class="detail-link">YouTube</a>
+                        <a href="https://instagram.com" target="_blank" rel="noopener" class="detail-link">Instagram</a>
+                    </div>
+                </div>
+
+                <!-- Column 3: Location & Legal -->
+                <div class="detail-col">
+                    <span class="detail-label">Local Time</span>
+                    <span class="local-time" id="local-time">--:-- IST</span>
+                    <span class="location">Bommasandra, India</span>
+                    <span class="copyright">© 2026 Ryan Joshy</span>
+                </div>
+
+            </div>
+
+        </div>
+    </section>
+
+    <script src="script.js"></script>
+</body>
+</html>
