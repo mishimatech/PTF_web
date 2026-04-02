@@ -10,13 +10,6 @@ const lenis = new Lenis({
     touchMultiplier: 2,
 });
 
-// Sync Lenis with GSAP ScrollTrigger
-function raf(time) {
-    lenis.raf(time);
-    requestAnimationFrame(raf);
-}
-requestAnimationFrame(raf);
-
 lenis.on('scroll', ScrollTrigger.update);
 
 gsap.ticker.add((time) => {
@@ -26,11 +19,65 @@ gsap.ticker.add((time) => {
 gsap.ticker.lagSmoothing(0);
 
 /* ===========================
-   Preloader - 2 Second Timer
+   Cached DOM References
+   Query once, reuse everywhere
    =========================== */
+const themeToggle = document.getElementById('theme-toggle');
 const preloader = document.getElementById('preloader');
 const cube = document.querySelector('.cube');
+const aboutSection = document.getElementById('about');
+const aboutBio = document.querySelector('.about-bio');
+const bioContent = document.querySelector('.bio-content');
+const aboutArsenal = document.querySelector('.about-arsenal');
+const scrambleHeading = document.querySelector('.scramble-heading');
+const statItems = Array.from(document.querySelectorAll('.stat-item'));
+const statNumbers = Array.from(document.querySelectorAll('.stat-number'));
+const dodgeTexts = Array.from(document.querySelectorAll('.dodge-text'));
+const customCursor = document.querySelector('.custom-cursor');
+const heroSticky = document.querySelector('.hero-sticky');
+const magneticBtn = document.querySelector('.magnetic-btn');
+const contactFooter = document.getElementById('contact-footer');
+const localTimeElement = document.getElementById('local-time');
+const videoCards = Array.from(document.querySelectorAll('.video-card'));
 
+const cursorMoveX = customCursor
+    ? gsap.quickTo(customCursor, 'x', { duration: 0.18, ease: 'power2.out' })
+    : null;
+const cursorMoveY = customCursor
+    ? gsap.quickTo(customCursor, 'y', { duration: 0.18, ease: 'power2.out' })
+    : null;
+const magneticMoveX = magneticBtn
+    ? gsap.quickTo(magneticBtn, 'x', { duration: 0.3, ease: 'power2.out' })
+    : null;
+const magneticMoveY = magneticBtn
+    ? gsap.quickTo(magneticBtn, 'y', { duration: 0.3, ease: 'power2.out' })
+    : null;
+
+/* ===========================
+   Theme Toggle - Light Mode
+   =========================== */
+if (themeToggle) {
+    themeToggle.addEventListener('click', () => {
+        document.body.classList.toggle('light-mode');
+
+        gsap.fromTo(themeToggle,
+            { scale: 0.9 },
+            { scale: 1, duration: 0.4, ease: 'elastic.out(1.2, 0.5)' }
+        );
+
+        const isLightMode = document.body.classList.contains('light-mode');
+        localStorage.setItem('theme', isLightMode ? 'light' : 'dark');
+    });
+
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'light') {
+        document.body.classList.add('light-mode');
+    }
+}
+
+/* ===========================
+   Preloader - 2 Second Timer
+   =========================== */
 // Hide preloader after exactly 2 seconds
 setTimeout(() => {
     const preloaderTimeline = gsap.timeline({
@@ -38,7 +85,7 @@ setTimeout(() => {
             preloader.style.display = 'none';
         }
     });
-    
+
     // Scale up cube as if pushing past camera
     preloaderTimeline.to(cube, {
         scale: 2.5,
@@ -46,7 +93,7 @@ setTimeout(() => {
         duration: 1,
         ease: 'power2.in',
     }, 0);
-    
+
     // Fade out the entire preloader
     preloaderTimeline.to(preloader, {
         opacity: 0,
@@ -73,22 +120,22 @@ let initialObjectRotationY = 0;
 // Listen for Spline load event
 splineViewer.addEventListener('load', (e) => {
     splineApp = e.target;
-    
+
     // Access the Spline application instance
     if (splineApp && splineApp.spline) {
         const spline = splineApp.spline;
-        
+
         // Main object is named "Parent" in the scene
         splineMainObject = spline.findObjectByName('Parent');
-        
+
         if (splineMainObject) {
             initialObjectRotationY = splineMainObject.rotation.y;
         }
-        
+
         // Initialize scroll-driven animation
         initSplineScrollAnimation();
     }
-    
+
     console.log('Spline scene loaded');
 });
 
@@ -102,7 +149,7 @@ function initSplineScrollAnimation() {
         scrub: 1.5,
         onUpdate: (self) => {
             const progress = self.progress;
-            
+
             // Rotate main object on scroll (0 to 180 degrees)
             if (splineMainObject) {
                 splineMainObject.rotation.y = initialObjectRotationY + (progress * Math.PI);
@@ -112,29 +159,11 @@ function initSplineScrollAnimation() {
 }
 
 /* ===========================
-   Cinematic Ambient Lighting
-   Subtle Breathing Glow
-   =========================== */
-const meshBg = document.querySelector('.mesh-bg');
-
-// Subtle pulsing glow effect - cinematic breathing
-gsap.to(meshBg, {
-    opacity: 0.85,
-    duration: 4,
-    ease: 'sine.inOut',
-    yoyo: true,
-    repeat: -1,
-});
-
-/* ===========================
    Hero 3D Reveal Animation
    =========================== */
-const splineHero = document.getElementById('spline-hero');
-
-// Cinematic fade-in for the 3D canvas
 const heroTimeline = gsap.timeline({ defaults: { ease: 'power4.out' } });
 
-heroTimeline.to(splineHero, {
+heroTimeline.to(splineViewer, {
     opacity: 1,
     duration: 2.5,
     ease: 'power2.inOut',
@@ -143,9 +172,6 @@ heroTimeline.to(splineHero, {
 /* ===========================
    Cinematic Section Slide-Ins
    =========================== */
-const aboutSection = document.getElementById('about');
-const gallerySection = document.getElementById('gallery');
-
 // About Section - Slide in from right with scrub
 gsap.to(aboutSection, {
     x: 0,
@@ -164,7 +190,6 @@ gsap.to(aboutSection, {
 /* ===========================
    Stacking Cards Pinned Timeline
    =========================== */
-const videoCards = document.querySelectorAll('.video-card');
 const galleryTl = gsap.timeline({
     scrollTrigger: {
         trigger: '#gallery',
@@ -184,7 +209,7 @@ videoCards.forEach((card, i) => {
 // Choreograph each card's entrance and exit
 videoCards.forEach((card, index) => {
     const isLast = index === videoCards.length - 1;
-    
+
     // Step A: Card enters from right, balloons to center
     galleryTl.to(card, {
         x: 0,
@@ -194,7 +219,7 @@ videoCards.forEach((card, index) => {
         duration: 1,
         ease: 'power2.out',
     }, index * 1.5);
-    
+
     // Step B: Card slides left and shrinks (except last card)
     if (!isLast) {
         galleryTl.to(card, {
@@ -213,11 +238,6 @@ videoCards.forEach((card, index) => {
         }, (index * 1.5) + 1);
     }
 });
-const aboutBio = document.querySelector('.about-bio');
-const bioContent = document.querySelector('.bio-content');
-const aboutArsenal = document.querySelector('.about-arsenal');
-const scrambleHeading = document.querySelector('.scramble-heading');
-
 /* ===========================
    Cryptographic Scramble Heading
    Matrix-style text distortion
@@ -225,7 +245,6 @@ const scrambleHeading = document.querySelector('.scramble-heading');
 const scrambleChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&*!?';
 const originalText = 'RYAN JOSHY';  // The true text to reveal
 let scrambleInterval = null;
-let isRevealed = false;
 
 // Generate random scrambled text
 function getScrambledText() {
@@ -238,10 +257,10 @@ function getScrambledText() {
 // Render text with proper serif styling on R and J
 function renderText(text, useSerif = false) {
     if (!scrambleHeading) return;
-    
+
     let html = '';
     const chars = text.split('');
-    
+
     chars.forEach((char, i) => {
         if (char === ' ') {
             html += ' ';
@@ -252,14 +271,14 @@ function renderText(text, useSerif = false) {
             html += char;
         }
     });
-    
+
     scrambleHeading.innerHTML = html;
 }
 
 // Start the scrambling effect
 function startScramble() {
     if (scrambleInterval) return;
-    
+
     scrambleInterval = setInterval(() => {
         renderText(getScrambledText(), false);
     }, 50); // Fast scramble rate for matrix effect
@@ -271,12 +290,12 @@ function revealText() {
         clearInterval(scrambleInterval);
         scrambleInterval = null;
     }
-    
+
     // Decode animation — progressively reveal each character
     let revealed = '';
     let currentIndex = 0;
     const chars = originalText.split('');
-    
+
     const decodeInterval = setInterval(() => {
         if (currentIndex < chars.length) {
             // Build revealed portion + scrambled remainder
@@ -285,7 +304,7 @@ function revealText() {
                 .split('')
                 .map(c => c === ' ' ? ' ' : scrambleChars[Math.floor(Math.random() * scrambleChars.length)])
                 .join('');
-            
+
             renderText(revealed + scrambledRemainder, true);
             currentIndex++;
         } else {
@@ -299,11 +318,10 @@ function revealText() {
 if (scrambleHeading) {
     // Start scrambling on page load
     startScramble();
-    
+
     scrambleHeading.addEventListener('mouseenter', () => {
-        isRevealed = true;
         revealText();
-        
+
         // Animate bio-content to visible
         gsap.to(bioContent, {
             opacity: 1,
@@ -315,11 +333,10 @@ if (scrambleHeading) {
             }
         });
     });
-    
+
     scrambleHeading.addEventListener('mouseleave', () => {
-        isRevealed = false;
         startScramble();
-        
+
         // Animate bio-content back to hidden
         gsap.to(bioContent, {
             opacity: 0,
@@ -330,6 +347,31 @@ if (scrambleHeading) {
                 bioContent.style.pointerEvents = 'none';
             }
         });
+    });
+
+    // Scroll-triggered clip-path reveal for scramble heading
+    ScrollTrigger.create({
+        trigger: scrambleHeading,
+        start: 'top 85%',
+        end: 'top 20%',
+        onEnter: () => {
+            gsap.to(scrambleHeading, {
+                clipPath: 'inset(0% 0 0 0)',
+                opacity: 1,
+                duration: 0.8,
+                ease: 'power3.out',
+            });
+            scrambleHeading.classList.add('revealed');
+        },
+        onLeaveBack: () => {
+            gsap.to(scrambleHeading, {
+                clipPath: 'inset(50% 0 0 0)',
+                opacity: 0,
+                duration: 0.5,
+                ease: 'power2.in',
+            });
+            scrambleHeading.classList.remove('revealed');
+        }
     });
 }
 
@@ -357,25 +399,121 @@ gsap.to(aboutArsenal, {
 });
 
 /* ===========================
-   Stats Counter Animation
+   Stats Counter Animation with Matrix Scramble
    =========================== */
-const statNumbers = document.querySelectorAll('.stat-number');
+const statScrambleChars = '0123456789@#$%&*!?';
 
+// Matrix scramble effect for stat numbers
 statNumbers.forEach((stat) => {
     const target = parseInt(stat.getAttribute('data-target'));
-    
+    const targetStr = target.toString();
+    let statScrambleInterval = null;
+    let isStatRevealed = false;
+
+    // Generate scrambled number
+    function getScrambledNumber() {
+        return targetStr.split('').map(() =>
+            statScrambleChars[Math.floor(Math.random() * statScrambleChars.length)]
+        ).join('');
+    }
+
+    // Start scrambling
+    function startStatScramble() {
+        if (statScrambleInterval) return;
+        statScrambleInterval = setInterval(() => {
+            stat.innerText = getScrambledNumber();
+        }, 50);
+    }
+
+    // Decode to real number
+    function revealStatNumber() {
+        if (statScrambleInterval) {
+            clearInterval(statScrambleInterval);
+            statScrambleInterval = null;
+        }
+
+        let currentIndex = 0;
+        const decodeInterval = setInterval(() => {
+            if (currentIndex < targetStr.length) {
+                const revealed = targetStr.substring(0, currentIndex + 1);
+                const scrambled = targetStr.substring(currentIndex + 1)
+                    .split('')
+                    .map(() => statScrambleChars[Math.floor(Math.random() * statScrambleChars.length)])
+                    .join('');
+                stat.innerText = revealed + scrambled;
+                currentIndex++;
+            } else {
+                clearInterval(decodeInterval);
+                stat.innerText = target;
+            }
+        }, 80);
+    }
+
+    // Hover interactions
+    stat.addEventListener('mouseenter', () => {
+        if (isStatRevealed) {
+            revealStatNumber();
+        }
+    });
+
+    stat.addEventListener('mouseleave', () => {
+        if (isStatRevealed) {
+            startStatScramble();
+        }
+    });
+
+    // Store functions for scroll trigger
+    stat._startScramble = startStatScramble;
+    stat._revealNumber = revealStatNumber;
+    stat._setRevealed = (val) => { isStatRevealed = val; };
+    stat._stopScramble = () => {
+        if (statScrambleInterval) {
+            clearInterval(statScrambleInterval);
+            statScrambleInterval = null;
+        }
+    };
+});
+
+// Clip-path reveal for each stat item with stagger
+statItems.forEach((item, index) => {
+    const statNum = statNumbers[index];
+
     ScrollTrigger.create({
-        trigger: '.stats-grid',
-        start: 'top 80%',
-        once: true,
+        trigger: item,
+        start: 'top 85%',
+        end: 'top 20%',
         onEnter: () => {
-            gsap.to(stat, {
-                innerText: target,
-                duration: 2,
+            // Clip reveal animation
+            gsap.to(item, {
+                clipPath: 'inset(0 0 0% 0)',
+                opacity: 1,
+                duration: 0.8,
+                delay: index * 0.15,
                 ease: 'power3.out',
-                snap: { innerText: 1 },
-                onUpdate: function() {
-                    stat.innerText = Math.floor(this.targets()[0].innerText);
+                onComplete: () => {
+                    item.classList.add('revealed');
+                    // Start matrix scramble after reveal
+                    if (statNum) {
+                        statNum._setRevealed(true);
+                        statNum._startScramble();
+                    }
+                }
+            });
+        },
+        onLeaveBack: () => {
+            // Clip out animation
+            gsap.to(item, {
+                clipPath: 'inset(0 0 50% 0)',
+                opacity: 0,
+                duration: 0.5,
+                ease: 'power2.in',
+                onStart: () => {
+                    item.classList.remove('revealed');
+                    if (statNum) {
+                        statNum._setRevealed(false);
+                        statNum._stopScramble();
+                        statNum.innerText = '0';
+                    }
                 }
             });
         }
@@ -390,10 +528,10 @@ function splitTextForDodge(element) {
     let newHTML = '';
     let insideTag = false;
     let currentTag = '';
-    
+
     for (let i = 0; i < text.length; i++) {
         const char = text[i];
-        
+
         if (char === '<') {
             insideTag = true;
             currentTag += char;
@@ -410,12 +548,11 @@ function splitTextForDodge(element) {
             newHTML += `<span class="dodge-letter">${char}</span>`;
         }
     }
-    
+
     element.innerHTML = newHTML;
 }
 
 // Apply text dodge to headlines
-const dodgeTexts = document.querySelectorAll('.dodge-text');
 dodgeTexts.forEach(splitTextForDodge);
 
 // Get all dodge letters
@@ -423,52 +560,41 @@ const dodgeLetters = document.querySelectorAll('.dodge-letter');
 const repelRadius = 100;
 const repelStrength = 75; // Tripled for aggressive text dodge
 
-// Mousemove handler for text repel
-document.addEventListener('mousemove', (e) => {
-    const mouseX = e.clientX;
-    const mouseY = e.clientY;
-    
+let dodgePointerX = 0;
+let dodgePointerY = 0;
+let dodgeFrame = null;
+
+function updateDodgeLetters() {
     dodgeLetters.forEach((letter) => {
         const rect = letter.getBoundingClientRect();
         const letterCenterX = rect.left + rect.width / 2;
         const letterCenterY = rect.top + rect.height / 2;
-        
-        const deltaX = letterCenterX - mouseX;
-        const deltaY = letterCenterY - mouseY;
+
+        const deltaX = letterCenterX - dodgePointerX;
+        const deltaY = letterCenterY - dodgePointerY;
         const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-        
+
         if (distance < repelRadius) {
             // Calculate repel force (stronger when closer)
             const force = (repelRadius - distance) / repelRadius;
             const angle = Math.atan2(deltaY, deltaX);
-            
+
             const moveX = Math.cos(angle) * force * repelStrength;
             const moveY = Math.sin(angle) * force * repelStrength;
-            
-            gsap.to(letter, {
-                x: moveX,
-                y: moveY,
-                duration: 0.2,
-                ease: 'power2.out',
-            });
+
+            letter.style.transform = `translate(${moveX}px, ${moveY}px)`;
         } else {
             // Return to original position
-            gsap.to(letter, {
-                x: 0,
-                y: 0,
-                duration: 0.4,
-                ease: 'elastic.out(1, 0.5)',
-            });
+            letter.style.transform = '';
         }
     });
-});
+
+    dodgeFrame = null;
+}
 
 /* ===========================
    Custom Cursor - Hero Only
    =========================== */
-const customCursor = document.querySelector('.custom-cursor');
-const heroSticky = document.querySelector('.hero-sticky');
-
 // Start cursor dead center of viewport
 gsap.set(customCursor, {
     x: window.innerWidth / 2,
@@ -477,19 +603,18 @@ gsap.set(customCursor, {
 });
 
 // Track mouse position
-let mouseX = window.innerWidth / 2;
-let mouseY = window.innerHeight / 2;
-
 document.addEventListener('mousemove', (e) => {
-    mouseX = e.clientX;
-    mouseY = e.clientY;
-    
-    gsap.to(customCursor, {
-        x: mouseX,
-        y: mouseY,
-        duration: 0.5,
-        ease: 'power2.out',
-    });
+    dodgePointerX = e.clientX;
+    dodgePointerY = e.clientY;
+
+    if (cursorMoveX && cursorMoveY) {
+        cursorMoveX(e.clientX);
+        cursorMoveY(e.clientY);
+    }
+
+    if (dodgeFrame === null) {
+        dodgeFrame = requestAnimationFrame(updateDodgeLetters);
+    }
 });
 
 // Show cursor only in Hero sticky area
@@ -516,7 +641,7 @@ videoCards.forEach((card) => {
     card.addEventListener('mouseenter', () => {
         card.classList.add('card-hover');
     });
-    
+
     card.addEventListener('mouseleave', () => {
         card.classList.remove('card-hover');
     });
@@ -525,8 +650,6 @@ videoCards.forEach((card) => {
 /* ===========================
    Footer Teal Peel Reveal
    =========================== */
-const contactFooter = document.getElementById('contact-footer');
-
 gsap.timeline({
     scrollTrigger: {
         trigger: '#gallery',
@@ -550,26 +673,22 @@ gsap.timeline({
 /* ===========================
    Magnetic Button Effect
    =========================== */
-const magneticBtn = document.querySelector('.magnetic-btn');
-
 if (magneticBtn) {
     magneticBtn.addEventListener('mouseenter', function() {
         this.style.transition = 'none';
     });
-    
+
     magneticBtn.addEventListener('mousemove', function(e) {
         const rect = this.getBoundingClientRect();
         const x = e.clientX - rect.left - rect.width / 2;
         const y = e.clientY - rect.top - rect.height / 2;
-        
-        gsap.to(this, {
-            x: x * 0.3,
-            y: y * 0.3,
-            duration: 0.3,
-            ease: 'power2.out',
-        });
+
+        if (magneticMoveX && magneticMoveY) {
+            magneticMoveX(x * 0.3);
+            magneticMoveY(y * 0.3);
+        }
     });
-    
+
     magneticBtn.addEventListener('mouseleave', function() {
         gsap.to(this, {
             x: 0,
@@ -583,8 +702,6 @@ if (magneticBtn) {
 /* ===========================
    Local Time Clock (IST)
    =========================== */
-const localTimeElement = document.getElementById('local-time');
-
 function updateLocalTime() {
     const now = new Date();
     const istTime = now.toLocaleTimeString('en-IN', {
@@ -593,7 +710,7 @@ function updateLocalTime() {
         minute: '2-digit',
         hour12: false
     });
-    
+
     if (localTimeElement) {
         localTimeElement.textContent = `${istTime} IST`;
     }
