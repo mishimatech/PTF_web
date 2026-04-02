@@ -35,6 +35,7 @@
     /* Typography */
     --font-display: 'Syne', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --font-serif: 'Playfair Display', 'Georgia', serif;
     
     /* Spacing */
     --spacing-xs: 0.5rem;
@@ -366,17 +367,43 @@ spline-viewer {
     width: 100%;
 }
 
-/* Massive Vibrant Headline */
-.about-headline {
+/* Scramble Heading - Mixed Typography */
+.scramble-heading {
     font-family: var(--font-display);
-    font-size: clamp(3rem, 12vw, 10rem);
+    font-size: clamp(3.5rem, 14vw, 12rem);
     font-weight: 900;
     line-height: 0.95;
     text-transform: uppercase;
-    letter-spacing: -0.04em;
+    letter-spacing: -0.03em;
     color: var(--text-primary);
     margin-bottom: var(--spacing-xl);
     text-align: center;
+    position: relative;
+    cursor: pointer;
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+                letter-spacing 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Magnifying glass hover — scale up + expand letter spacing */
+.scramble-heading:hover {
+    transform: scale(1.15);
+    letter-spacing: 0.05em;
+}
+
+/* Serif accent letters within the heading */
+.scramble-heading .serif {
+    font-family: var(--font-serif);
+    font-weight: 500;
+    font-style: italic;
+    color: var(--accent-vibrant-red);
+    text-shadow: 0 0 60px rgba(255, 69, 69, 0.5),
+                 0 0 100px rgba(255, 69, 69, 0.3);
+}
+
+/* Each letter wrapped for scramble animation */
+.scramble-heading .scramble-char {
+    display: inline-block;
+    will-change: transform, opacity;
 }
 
 .headline-line {
@@ -411,29 +438,41 @@ spline-viewer {
     opacity: 0;
 }
 
+/* Bio Content - Hidden by Default for Cryptographic Reveal */
 .bio-content {
     max-width: 600px;
-}
-
-.bio-line {
-    font-size: 1.1rem;
-    line-height: 1.8;
-    color: var(--text-secondary);
-    margin-bottom: 1.5rem;
     opacity: 0;
-    transform: translateY(30px);
+    filter: blur(10px);
+    pointer-events: none;
+    transition: opacity 0.6s ease, filter 0.6s ease;
 }
 
-.bio-line strong {
+/* Revealed state - applied via JS */
+.bio-content.revealed {
+    opacity: 1;
+    filter: blur(0);
+    pointer-events: auto;
+}
+
+.bio-text {
+    font-size: 1.15rem;
+    line-height: 1.9;
+    color: var(--text-secondary);
+    font-weight: 400;
+    letter-spacing: 0.01em;
+}
+
+.bio-text strong {
     color: var(--text-primary);
     font-weight: 600;
 }
 
-.bio-line em {
+.bio-text em {
     color: var(--crimson-accent);
     font-style: normal;
 }
 
+/* Arsenal Card */
 /* Arsenal Card */
 .about-arsenal {
     opacity: 0;
@@ -450,6 +489,17 @@ spline-viewer {
     box-shadow: 
         inset 0 1px 1px rgba(184, 69, 69, 0.1),
         0 8px 32px rgba(13, 5, 5, 0.5);
+    cursor: pointer;
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+                box-shadow 0.4s ease;
+}
+
+.arsenal-card:hover {
+    transform: scale(1.05);
+    box-shadow: 
+        inset 0 1px 1px rgba(184, 69, 69, 0.1),
+        0 12px 48px rgba(13, 5, 5, 0.6),
+        0 0 40px rgba(255, 69, 69, 0.15);
 }
 
 .arsenal-title {
@@ -469,9 +519,7 @@ spline-viewer {
 }
 
 .arsenal-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+    display: block;
     padding: 1.2rem 0;
     border-bottom: 1px solid rgba(138, 53, 53, 0.15);
 }
@@ -480,12 +528,38 @@ spline-viewer {
     border-bottom: none;
 }
 
+.tool-info {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+}
+
 .tool-name {
     font-family: var(--font-display);
     font-size: 1.2rem;
     font-weight: 600;
     color: var(--accent-vibrant-red);
     letter-spacing: 0.02em;
+}
+
+/* Hidden extra details — revealed on hover */
+.tool-details {
+    width: 100%;
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin-top: 0;
+    transition: max-height 0.4s ease, opacity 0.3s ease, margin-top 0.3s ease;
+}
+
+.arsenal-card:hover .tool-details {
+    max-height: 80px;
+    opacity: 1;
+    margin-top: 0.75rem;
 }
 
 .tool-desc {
@@ -561,11 +635,11 @@ spline-viewer {
         padding: var(--spacing-lg) var(--spacing-sm);
     }
     
-    .about-headline {
-        font-size: clamp(2rem, 10vw, 4rem);
+    .scramble-heading {
+        font-size: clamp(2.5rem, 12vw, 5rem);
     }
     
-    .bio-line {
+    .bio-text {
         font-size: 1rem;
     }
     

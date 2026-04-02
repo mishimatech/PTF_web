@@ -214,9 +214,124 @@ videoCards.forEach((card, index) => {
     }
 });
 const aboutBio = document.querySelector('.about-bio');
-const bioLines = document.querySelectorAll('.bio-line');
+const bioContent = document.querySelector('.bio-content');
 const aboutArsenal = document.querySelector('.about-arsenal');
-const aboutHeadline = document.querySelector('.about-headline');
+const scrambleHeading = document.querySelector('.scramble-heading');
+
+/* ===========================
+   Cryptographic Scramble Heading
+   Matrix-style text distortion
+   =========================== */
+const scrambleChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&*!?';
+const originalText = 'RYAN JOSHY';  // The true text to reveal
+let scrambleInterval = null;
+let isRevealed = false;
+
+// Generate random scrambled text
+function getScrambledText() {
+    return originalText.split('').map(char => {
+        if (char === ' ') return ' ';
+        return scrambleChars[Math.floor(Math.random() * scrambleChars.length)];
+    }).join('');
+}
+
+// Render text with proper serif styling on R and J
+function renderText(text, useSerif = false) {
+    if (!scrambleHeading) return;
+    
+    let html = '';
+    const chars = text.split('');
+    
+    chars.forEach((char, i) => {
+        if (char === ' ') {
+            html += ' ';
+        } else if (useSerif && (i === 0 || i === 5)) {
+            // Apply serif class to R (index 0) and J (index 5 in "RYAN JOSHY")
+            html += `<span class="serif">${char}</span>`;
+        } else {
+            html += char;
+        }
+    });
+    
+    scrambleHeading.innerHTML = html;
+}
+
+// Start the scrambling effect
+function startScramble() {
+    if (scrambleInterval) return;
+    
+    scrambleInterval = setInterval(() => {
+        renderText(getScrambledText(), false);
+    }, 50); // Fast scramble rate for matrix effect
+}
+
+// Stop scrambling and reveal true text with decode animation
+function revealText() {
+    if (scrambleInterval) {
+        clearInterval(scrambleInterval);
+        scrambleInterval = null;
+    }
+    
+    // Decode animation — progressively reveal each character
+    let revealed = '';
+    let currentIndex = 0;
+    const chars = originalText.split('');
+    
+    const decodeInterval = setInterval(() => {
+        if (currentIndex < chars.length) {
+            // Build revealed portion + scrambled remainder
+            revealed = originalText.substring(0, currentIndex + 1);
+            const scrambledRemainder = originalText.substring(currentIndex + 1)
+                .split('')
+                .map(c => c === ' ' ? ' ' : scrambleChars[Math.floor(Math.random() * scrambleChars.length)])
+                .join('');
+            
+            renderText(revealed + scrambledRemainder, true);
+            currentIndex++;
+        } else {
+            clearInterval(decodeInterval);
+            renderText(originalText, true);
+        }
+    }, 60);
+}
+
+// Hover handlers for scramble heading
+if (scrambleHeading) {
+    // Start scrambling on page load
+    startScramble();
+    
+    scrambleHeading.addEventListener('mouseenter', () => {
+        isRevealed = true;
+        revealText();
+        
+        // Animate bio-content to visible
+        gsap.to(bioContent, {
+            opacity: 1,
+            filter: 'blur(0px)',
+            duration: 0.6,
+            ease: 'power2.out',
+            onStart: () => {
+                bioContent.style.pointerEvents = 'auto';
+            }
+        });
+    });
+    
+    scrambleHeading.addEventListener('mouseleave', () => {
+        isRevealed = false;
+        startScramble();
+        
+        // Animate bio-content back to hidden
+        gsap.to(bioContent, {
+            opacity: 0,
+            filter: 'blur(10px)',
+            duration: 0.4,
+            ease: 'power2.in',
+            onComplete: () => {
+                bioContent.style.pointerEvents = 'none';
+            }
+        });
+    });
+}
 
 // Bio fade-in trigger
 gsap.to(aboutBio, {
@@ -226,31 +341,6 @@ gsap.to(aboutBio, {
         trigger: '#about',
         start: 'left 80%',
         containerAnimation: false,
-    }
-});
-
-// Headline reveal
-gsap.from(aboutHeadline, {
-    opacity: 0,
-    y: 100,
-    duration: 1.5,
-    ease: 'power3.out',
-    scrollTrigger: {
-        trigger: '#about',
-        start: 'top 70%',
-    }
-});
-
-// Staggered bio line reveal
-gsap.to(bioLines, {
-    opacity: 1,
-    y: 0,
-    duration: 0.8,
-    stagger: 0.15,
-    ease: 'power2.out',
-    scrollTrigger: {
-        trigger: '.bio-content',
-        start: 'top 75%',
     }
 });
 
